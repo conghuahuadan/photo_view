@@ -181,10 +181,14 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
           )
         : PhotoViewGalleryPageOptions(
             imageProvider: AssetImage(item.resource),
-            initialScale: PhotoViewComputedScale.covered,
+            initialScale: PhotoViewComputedScale.adaptived,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
-            heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+            heroAttributes: PhotoViewHeroAttributes(
+              tag: item.id,
+              // createRectTween: (begin, end) =>
+              //     RectTween(begin: begin, end: end),
+            ),
             basePosition: Alignment.center,
           );
   }
