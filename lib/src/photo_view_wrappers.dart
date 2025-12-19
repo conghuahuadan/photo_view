@@ -178,7 +178,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
     final scaleBoundaries = ScaleBoundaries(
       widget.minScale ?? 0.0,
       widget.maxScale ?? double.infinity,
-      widget.initialScale ?? PhotoViewComputedScale.contained,
+      widget.initialScale ?? PhotoViewComputedScale.adaptived,
       widget.outerSize,
       _imageSize!,
     );
@@ -204,6 +204,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
       filterQuality: widget.filterQuality ?? FilterQuality.none,
       disableGestures: widget.disableGestures ?? false,
       enablePanAlways: widget.enablePanAlways ?? false,
+      initialScale: widget.initialScale,
     );
   }
 
@@ -289,7 +290,7 @@ class CustomChildWrapper extends StatelessWidget {
     final scaleBoundaries = ScaleBoundaries(
       minScale ?? 0.0,
       maxScale ?? double.infinity,
-      initialScale ?? PhotoViewComputedScale.contained,
+      initialScale ?? PhotoViewComputedScale.adaptived,
       outerSize,
       childSize ?? outerSize,
     );
@@ -313,6 +314,7 @@ class CustomChildWrapper extends StatelessWidget {
       filterQuality: filterQuality ?? FilterQuality.none,
       disableGestures: disableGestures ?? false,
       enablePanAlways: enablePanAlways ?? false,
+      initialScale: initialScale,
     );
   }
 }

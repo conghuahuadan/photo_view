@@ -48,8 +48,8 @@ List<GalleryExampleItem> galleryItems = <GalleryExampleItem>[
     id: "tag3",
     resource: "assets/gallery2.jpg",
   ),
-  GalleryExampleItem(
-    id: "tag4",
-    resource: "assets/gallery3.jpg",
-  ),
+  // GalleryExampleItem(
+  //   id: "tag4",
+  //   resource: "assets/gallery3.jpg",
+  // ),
 ];

@@ -1,3 +1,4 @@
+import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart'
     show
@@ -10,8 +11,10 @@ import 'package:photo_view/photo_view.dart'
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
+import 'package:photo_view/src/core/base_position.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
+import 'package:photo_view/src/photo_view_computed_scale.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
 
 const _defaultDecoration = const BoxDecoration(
@@ -43,6 +46,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
+    required this.initialScale,
   })  : customChild = null,
         super(key: key);
 
@@ -66,6 +70,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
+    required this.initialScale,
   })  : imageProvider = null,
         semanticLabel = null,
         gaplessPlayback = false,
@@ -94,6 +99,7 @@ class PhotoViewCore extends StatefulWidget {
   final bool disableGestures;
   final bool enablePanAlways;
   final bool strictScale;
+  final dynamic initialScale;
 
   final FilterQuality filterQuality;
 
@@ -349,6 +355,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
                 scaleBoundaries.childSize,
                 basePosition,
                 useImageScale,
+                widget.initialScale,
               ),
               child: _buildHero(),
             );
@@ -361,7 +368,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
                 child: Transform(
                   child: customChildLayout,
                   transform: matrix,
-                  alignment: basePosition,
+                  alignment: calTransformAlignment(),
                 ),
               ),
               decoration: widget.backgroundDecoration ?? _defaultDecoration,
@@ -389,6 +396,18 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             return Container();
           }
         });
+  }
+
+  Alignment calTransformAlignment() {
+    if (widget.initialScale == PhotoViewComputedScale.adaptived) {
+      final Size size = scaleBoundaries.outerSize;
+      final Size childSize = scaleBoundaries.childSize;
+      final double deviceRatio = size.width / size.height;
+      final double picRatio = childSize.width / childSize.height;
+      return deviceRatio > picRatio ? Alignment.topCenter : Alignment.center;
+    } else {
+      return basePosition;
+    }
   }
 
   Widget _buildHero() {
@@ -423,23 +442,47 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
     this.subjectSize,
     this.basePosition,
     this.useImageScale,
+    this.initialScale,
   );
 
   final Size subjectSize;
   final Alignment basePosition;
   final bool useImageScale;
+  final dynamic initialScale;
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final childWidth = useImageScale ? childSize.width : subjectSize.width;
-    final childHeight = useImageScale ? childSize.height : subjectSize.height;
+    final deviceRatio = size.width / size.height;
+    final picRatio = childSize.width / childSize.height;
+    if (initialScale == PhotoViewComputedScale.adaptived) {
+      Alignment position;
+      if (deviceRatio > picRatio) {
+        position = Alignment.topCenter;
+      } else {
+        position = Alignment.center;
+      }
+      final childWidth = useImageScale ? childSize.width : subjectSize.width;
+      final childHeight = useImageScale ? childSize.height : subjectSize.height;
+      final halfWidth = (size.width - childWidth) / 2;
+      final halfHeight = (size.height - childHeight) / 2;
+      final double offsetX = halfWidth * (position.x + 1);
+      final double offsetY = halfHeight * (position.y + 1);
+      debugPrint(
+          'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
+      return Offset(offsetX, offsetY);
+    } else {
+      final childWidth = useImageScale ? childSize.width : subjectSize.width;
+      final childHeight = useImageScale ? childSize.height : subjectSize.height;
 
-    final halfWidth = (size.width - childWidth) / 2;
-    final halfHeight = (size.height - childHeight) / 2;
+      final halfWidth = (size.width - childWidth) / 2;
+      final halfHeight = (size.height - childHeight) / 2;
 
-    final double offsetX = halfWidth * (basePosition.x + 1);
-    final double offsetY = halfHeight * (basePosition.y + 1);
-    return Offset(offsetX, offsetY);
+      final double offsetX = halfWidth * (basePosition.x + 1);
+      final double offsetY = halfHeight * (basePosition.y + 1);
+      debugPrint(
+          'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
+      return Offset(offsetX, offsetY);
+    }
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show Size;
 
+import 'package:flutter/widgets.dart';
 import "package:photo_view/src/photo_view_computed_scale.dart";
 import 'package:photo_view/src/photo_view_scale_state.dart';
 
@@ -73,18 +74,34 @@ class ScaleBoundaries {
   }
 
   double get initialScale {
-    assert(_initialScale is double || _initialScale is PhotoViewComputedScale);
-    if (_initialScale == PhotoViewComputedScale.contained) {
-      return _scaleForContained(outerSize, childSize) *
-          (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
-              .multiplier;
+    // debugPrint("initialScale outerSize: $outerSize, childSize: $childSize");
+    final deviceRatio = outerSize.width / outerSize.height;
+    final picRatio = childSize.width / childSize.height;
+    if (_initialScale == PhotoViewComputedScale.adaptived) {
+      if (deviceRatio > picRatio) {
+        return _scaleForCovering(outerSize, childSize) *
+            (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
+                .multiplier;
+      } else {
+        return _scaleForContained(outerSize, childSize) *
+            (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
+                .multiplier;
+      }
+    } else {
+      assert(
+          _initialScale is double || _initialScale is PhotoViewComputedScale);
+      if (_initialScale == PhotoViewComputedScale.contained) {
+        return _scaleForContained(outerSize, childSize) *
+            (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
+                .multiplier;
+      }
+      if (_initialScale == PhotoViewComputedScale.covered) {
+        return _scaleForCovering(outerSize, childSize) *
+            (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
+                .multiplier;
+      }
+      return _initialScale.clamp(minScale, maxScale);
     }
-    if (_initialScale == PhotoViewComputedScale.covered) {
-      return _scaleForCovering(outerSize, childSize) *
-          (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
-              .multiplier;
-    }
-    return _initialScale.clamp(minScale, maxScale);
   }
 
   @override
