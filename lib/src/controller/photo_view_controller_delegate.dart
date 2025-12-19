@@ -201,6 +201,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     final double screenWidth = scaleBoundaries.outerSize.width;
     final double screenHeight = scaleBoundaries.outerSize.height;
 
+    // debugPrint(
+    //     'computedHeight: ${screenHeight}, ${computedHeight}, ${_position.dy}, ${scaleBoundaries.childSize.height}, ${_scale}');
+
     double finalX = 0.0;
     if (screenWidth < computedWidth) {
       final cornersX = this.cornersX(scale: _scale);

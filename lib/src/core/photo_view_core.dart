@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
@@ -157,6 +158,13 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
+    debugPrint('onScaleUpdate: $details');
+
+    // Offset offset = posOffset.value;
+    // offset = Offset(offset.dx + details.focalPointDelta.dx,
+    //     offset.dy + details.focalPointDelta.dy);
+    // posOffset.value = offset;
+
     final double newScale = _scaleBefore! * details.scale;
     final Offset delta = details.focalPoint - _normalizedPosition!;
 
@@ -177,6 +185,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           widget.enableRotation ? _rotationBefore! + details.rotation : null,
       rotationFocusPoint: widget.enableRotation ? details.focalPoint : null,
     );
+  }
+
+  void onDragUpdate(DragUpdateDetails details) {
+    debugPrint('onDragUpdate: $details');
   }
 
   void onScaleEnd(ScaleEndDetails details) {
@@ -407,7 +419,16 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             }
 
             return PhotoViewGestureDetector(
-              child: child,
+              child: ValueListenableBuilder<Offset>(
+                valueListenable: posOffset,
+                builder: (context, offset, child) {
+                  return Transform.translate(
+                    offset: offset,
+                    child: child,
+                  );
+                },
+                child: child,
+              ),
               onDoubleTap: onDoubleTap,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,
@@ -425,6 +446,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           }
         });
   }
+
+  ValueNotifier<Offset> posOffset = ValueNotifier(Offset.zero);
 
   Alignment calTransformAlignment() {
     if (widget.initialScale == PhotoViewComputedScale.adaptived) {
