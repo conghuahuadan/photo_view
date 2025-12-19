@@ -120,6 +120,9 @@ class PhotoExampleState extends State<PhotoExample> {
             return PhotoViewGalleryPageOptions(
               imageProvider: CachedNetworkImageProvider(images[index].url),
               heroAttributes: PhotoViewHeroAttributes(tag: images[index].url),
+              onTapUp: (context, details, value) {
+                Navigator.pop(context);
+              },
             );
           },
           itemCount: images.length,
