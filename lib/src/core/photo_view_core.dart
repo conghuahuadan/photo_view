@@ -1,5 +1,6 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:math' as math;
 import 'package:photo_view/photo_view.dart'
     show
         PhotoViewScaleState,
@@ -225,6 +226,33 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void onDoubleTap(TapDownDetails details) {
+    if (widget.initialScale == PhotoViewComputedScale.adaptived) {
+      final Size size = scaleBoundaries.outerSize;
+      final Size childSize = scaleBoundaries.childSize;
+      final double containedRaw = math.min(
+          size.width / childSize.width, size.height / childSize.height);
+      final double coveredRaw = math.max(
+          size.width / childSize.width, size.height / childSize.height);
+      final double contained = containedRaw.clamp(
+          scaleBoundaries.minScale, scaleBoundaries.maxScale);
+      final double covered =
+          coveredRaw.clamp(scaleBoundaries.minScale, scaleBoundaries.maxScale);
+
+      final double current = scale;
+      final double target =
+          (current - covered).abs() < 0.001 ? contained : covered;
+
+      animateScale(current, target);
+      animateRotation(controller.rotation, 0.0);
+
+      final center = Offset(context.size!.width / 2, context.size!.height / 2);
+      final tapPosition = details.localPosition;
+      final toPosition =
+          (controller.position + center - tapPosition) * target / current;
+      animatePosition(controller.position, toPosition);
+      return;
+    }
+
     nextScaleState();
 
     final currentState = scaleStateController.scaleState;
