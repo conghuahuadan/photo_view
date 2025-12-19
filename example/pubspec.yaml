@@ -20,13 +20,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/neat.gif
-    - assets/large-image.jpg
-    - assets/small-image.jpg
-    - assets/gallery1.jpg
-    - assets/gallery2.jpg
-    - assets/gallery3.jpg
-    - assets/firefox.svg
+    - assets/
 
   fonts:
     - family: PTSans

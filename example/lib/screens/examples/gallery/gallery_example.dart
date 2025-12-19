@@ -32,6 +32,12 @@ class _GalleryExampleState extends State<GalleryExample> {
                   },
                 ),
                 GalleryExampleItemThumbnail(
+                  galleryExampleItem: galleryItems[1],
+                  onTap: () {
+                    open(context, 1);
+                  },
+                ),
+                GalleryExampleItemThumbnail(
                   galleryExampleItem: galleryItems[2],
                   onTap: () {
                     open(context, 2);
