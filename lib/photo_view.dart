@@ -521,8 +521,9 @@ class _PhotoViewState extends State<PhotoView>
                 enableRotation: widget.enableRotation,
                 controller: _controller,
                 scaleStateController: _scaleStateController,
-                maxScale: widget.maxScale,
-                minScale: widget.minScale,
+                maxScale:
+                    widget.maxScale ?? PhotoViewComputedScale.covered * 1.5,
+                minScale: widget.minScale ?? PhotoViewComputedScale.contained,
                 initialScale: widget.initialScale,
                 basePosition: widget.basePosition,
                 scaleStateCycle: widget.scaleStateCycle,
@@ -548,8 +549,9 @@ class _PhotoViewState extends State<PhotoView>
                 enableRotation: widget.enableRotation,
                 controller: _controller,
                 scaleStateController: _scaleStateController,
-                maxScale: widget.maxScale,
-                minScale: widget.minScale,
+                maxScale:
+                    widget.maxScale ?? PhotoViewComputedScale.covered * 1.5,
+                minScale: widget.minScale ?? PhotoViewComputedScale.contained,
                 initialScale: widget.initialScale,
                 basePosition: widget.basePosition,
                 scaleStateCycle: widget.scaleStateCycle,
