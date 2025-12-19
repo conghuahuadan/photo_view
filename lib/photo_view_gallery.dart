@@ -276,6 +276,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             filterQuality: pageOption.filterQuality,
             basePosition: pageOption.basePosition,
             disableGestures: pageOption.disableGestures,
+            enablePanAlways: false,
           )
         : PhotoView(
             key: ObjectKey(index),
@@ -304,6 +305,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             basePosition: pageOption.basePosition,
             disableGestures: pageOption.disableGestures,
             errorBuilder: pageOption.errorBuilder,
+            enablePanAlways: false,
           );
 
     return ClipRect(

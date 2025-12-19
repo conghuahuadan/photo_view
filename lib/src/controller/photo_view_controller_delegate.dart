@@ -8,6 +8,7 @@ import 'package:photo_view/photo_view.dart'
 import 'package:photo_view/src/core/photo_view_core.dart';
 import 'package:photo_view/src/photo_view_scale_state.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
+import 'package:photo_view/src/photo_view_computed_scale.dart';
 
 /// A  class to hold internal layout logic to sync both controller states
 ///
@@ -22,7 +23,17 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   ScaleStateCycle get scaleStateCycle => widget.scaleStateCycle;
 
-  Alignment get basePosition => widget.basePosition;
+  Alignment get basePosition {
+    if (widget.initialScale == PhotoViewComputedScale.adaptived) {
+      final Size size = scaleBoundaries.outerSize;
+      final Size childSize = scaleBoundaries.childSize;
+      final double deviceRatio = size.width / size.height;
+      final double picRatio = childSize.width / childSize.height;
+      return deviceRatio > picRatio ? Alignment.topCenter : Alignment.center;
+    }
+    return widget.basePosition;
+  }
+
   Function(double prevScale, double nextScale)? _animateScale;
 
   /// Mark if scale need recalculation, useful for scale boundaries changes.

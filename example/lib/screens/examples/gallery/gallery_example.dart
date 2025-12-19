@@ -181,10 +181,11 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
           )
         : PhotoViewGalleryPageOptions(
             imageProvider: AssetImage(item.resource),
-            // initialScale: PhotoViewComputedScale.adaptived,
+            initialScale: PhotoViewComputedScale.covered,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
             heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+            basePosition: Alignment.center,
           );
   }
 }

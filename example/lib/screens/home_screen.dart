@@ -7,6 +7,7 @@ import 'package:photo_view_example/screens/examples/dialog_example.dart';
 import 'package:photo_view_example/screens/examples/gallery/gallery_example.dart';
 import 'package:photo_view_example/screens/examples/hero_example.dart';
 import 'package:photo_view_example/screens/examples/inline_examples.dart';
+import 'package:photo_view_example/screens/examples/photo_example.dart';
 import 'package:photo_view_example/screens/examples/rotation_examples.dart';
 
 import 'examples/network_images.dart';
@@ -30,6 +31,18 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: ListView(
               children: <Widget>[
+                _buildItem(
+                  context,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PhotoExample(),
+                      ),
+                    );
+                  },
+                  text: "Photo",
+                ),
                 _buildItem(
                   context,
                   onPressed: () {
