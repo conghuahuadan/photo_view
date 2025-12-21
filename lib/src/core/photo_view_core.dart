@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
@@ -149,6 +151,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void onScaleStart(ScaleStartDetails details) {
+    // isScrolling = false;
+    // isDraging = false;
     _rotationBefore = controller.rotation;
     _scaleBefore = scale;
     _normalizedPosition = details.focalPoint - controller.position;
@@ -158,7 +162,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
-    debugPrint('onScaleUpdate: $details');
+    // debugPrint('onScaleUpdate: $details');
 
     // Offset offset = posOffset.value;
     // offset = Offset(offset.dx + details.focalPointDelta.dx,
@@ -187,15 +191,20 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     );
   }
 
-  void onDragUpdate(DragUpdateDetails details) {
-    debugPrint('onDragUpdate: $details');
-  }
+  Timer? timer;
 
   void onScaleEnd(ScaleEndDetails details) {
+    // debugPrint('onScaleEnd: $details');
+
     final double _scale = scale;
-    final Offset _position = controller.position;
+    Offset _position = controller.position;
     final double maxScale = scaleBoundaries.maxScale;
     final double minScale = scaleBoundaries.minScale;
+
+    if (widget.enablePanAlways) {
+      opacity.value = 1.0;
+      animatePosition(_position, clampPosition());
+    }
 
     widget.onScaleEnd?.call(context, details, controller.value);
 
@@ -235,9 +244,17 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         clampPosition(position: _position + direction * 100.0),
       );
     }
+
+    timer?.cancel();
+    timer = Timer(const Duration(milliseconds: 500), () {
+      isScrolling = false;
+      isDraging = false;
+    });
   }
 
   void onDoubleTap(TapDownDetails details) {
+    isScrolling = false;
+    isDraging = false;
     if (widget.initialScale == PhotoViewComputedScale.adaptived) {
       final Size size = scaleBoundaries.outerSize;
       final Size childSize = scaleBoundaries.childSize;
@@ -516,8 +533,8 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
       final halfHeight = (size.height - childHeight) / 2;
       final double offsetX = halfWidth * (position.x + 1);
       final double offsetY = halfHeight * (position.y + 1);
-      debugPrint(
-          'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
+      // debugPrint(
+      //     'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
       return Offset(offsetX, offsetY);
     } else {
       final childWidth = useImageScale ? childSize.width : subjectSize.width;
@@ -528,8 +545,8 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
 
       final double offsetX = halfWidth * (basePosition.x + 1);
       final double offsetY = halfHeight * (basePosition.y + 1);
-      debugPrint(
-          'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
+      // debugPrint(
+      //     'initialScale: ${initialScale}, subjectSize: $subjectSize, childSize: $childSize, offsetY: $offsetY');
       return Offset(offsetX, offsetY);
     }
   }

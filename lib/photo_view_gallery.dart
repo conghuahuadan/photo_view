@@ -240,7 +240,11 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
         itemCount: itemCount,
         itemBuilder: _buildItem,
         scrollDirection: widget.scrollDirection,
-        physics: widget.scrollPhysics,
+        physics: widget.scrollPhysics != null
+            ? widget.scrollPhysics!
+                .applyTo(const AlwaysScrollableScrollPhysics())
+            : const PageScrollPhysics()
+                .applyTo(const AlwaysScrollableScrollPhysics()),
         allowImplicitScrolling: widget.allowImplicitScrolling,
         pageSnapping: widget.pageSnapping,
       ),

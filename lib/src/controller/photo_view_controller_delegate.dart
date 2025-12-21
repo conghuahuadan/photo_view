@@ -25,6 +25,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   late final ValueNotifier<double> opacity = ValueNotifier(1.0);
 
+  bool isScrolling = false;
+  bool isDraging = false;
+
   Alignment get basePosition {
     if (widget.initialScale == PhotoViewComputedScale.adaptived) {
       final Size size = scaleBoundaries.outerSize;
@@ -75,11 +78,15 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void _blindScaleListener() {
-    if (!widget.enablePanAlways) {
+    debugPrint("_blindScaleListener");
+
+    if (!widget.enablePanAlways || isScrolling) {
       controller.position = clampPosition();
-    } /*  else {
-      controller.position = calOpacity();
-    } */
+    } else {
+      if (!isDraging) {
+        controller.position = clampPosition();
+      }
+    }
     if (controller.scale == controller.prevValue.scale) {
       return;
     }
@@ -205,27 +212,39 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     final double screenWidth = scaleBoundaries.outerSize.width;
     final double screenHeight = scaleBoundaries.outerSize.height;
 
-    double finalX = 0.0;
-    // final cornersX = this.cornersX(scale: _scale);
-    finalX = _position.dx /* .clamp(cornersX.min, cornersX.max) */;
-    if (screenWidth < computedWidth) {}
-
     double finalY = 0.0;
     final cornersY = this.cornersY(scale: _scale);
-    finalY = _position.dy /* .clamp(cornersY.min, cornersY.max) */;
+    finalY = _position.dy;
     if (screenHeight < computedHeight) {
       if (finalY > cornersY.max) {
-        opacity.value = (1 - (finalY - cornersY.max).abs() / 120).clamp(0.3, 1);
-      } else if (finalY < cornersY.min) {
-        opacity.value = (1 - (finalY - cornersY.min).abs() / 120).clamp(0.3, 1);
+        if (!isScrolling) {
+          isScrolling = false;
+          isDraging = true;
+          opacity.value =
+              (1 - (finalY - cornersY.max).abs() / 120).clamp(0.3, 1);
+        }
       } else {
-        opacity.value = 1;
+        if (!isDraging && finalY < 0) {
+          isScrolling = true;
+          isDraging = false;
+          opacity.value = 1;
+        }
       }
     } else {
-      opacity.value = (1 - finalY.abs() / 120).clamp(0.3, 1);
+      isScrolling = false;
+      isDraging = true;
+      if (!isScrolling) {
+        opacity.value = (1 - finalY.abs() / 120).clamp(0.3, 1);
+      }
     }
+
+    double finalX = _position.dx;
+    if (isScrolling) {
+      finalX = 0;
+    }
+
     // debugPrint(
-    //     'computedHeight: ${screenHeight}, ${computedHeight}, ${_position.dy}, ${scaleBoundaries.childSize.height}, ${cornersY.min}, ${cornersY.max}');
+    //     'computedHeight: ${isDraging}, ${isScrolling}, ${screenHeight}, ${computedHeight}, ${_position.dy}, ${scaleBoundaries.childSize.height}, ${cornersY.min}, ${cornersY.max}');
 
     return Offset(finalX, finalY);
   }

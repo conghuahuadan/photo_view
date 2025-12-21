@@ -95,7 +95,7 @@ class PhotoExampleState extends State<PhotoExample> {
                   aspectRatio: 1,
                   child: GestureDetector(
                     onTap: () {
-                      _onTap(index);
+                      _onTap(images, index, images[index].cover);
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Hero(
@@ -119,10 +119,16 @@ class PhotoExampleState extends State<PhotoExample> {
               height: 100,
               child: GestureDetector(
                 onTap: () {
-                  // _onTap(8);
+                  _onTap([
+                    Pic(
+                        cover:
+                            "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif",
+                        url:
+                            "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif")
+                  ], 0, "");
                 },
                 child: Hero(
-                    tag: images[8].cover,
+                    tag: "",
                     child: CachedNetworkImage(
                       imageUrl: images[8].cover,
                       fit: BoxFit.cover,
@@ -136,20 +142,19 @@ class PhotoExampleState extends State<PhotoExample> {
     );
   }
 
-  void _onTap(int index) {
+  void _onTap(List<Pic> images, int index, String hero) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PhotoViewGallery.builder(
-          scrollPhysics: const BouncingScrollPhysics(),
           builder: (context, index) {
             return PhotoViewGalleryPageOptions(
               imageProvider: CachedNetworkImageProvider(images[index].url),
-              heroAttributes: PhotoViewHeroAttributes(tag: images[index].url),
+              heroAttributes: PhotoViewHeroAttributes(tag: hero),
               onTapUp: (context, details, value) {
                 Navigator.pop(context);
               },
-              enablePanAlways: false,
+              enablePanAlways: true,
             );
           },
           itemCount: images.length,
