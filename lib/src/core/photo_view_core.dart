@@ -51,6 +51,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.enablePanAlways,
     required this.strictScale,
     required this.initialScale,
+    this.onCloseCallback,
   })  : customChild = null,
         super(key: key);
 
@@ -75,6 +76,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.enablePanAlways,
     required this.strictScale,
     required this.initialScale,
+    this.onCloseCallback,
   })  : imageProvider = null,
         semanticLabel = null,
         gaplessPlayback = false,
@@ -97,6 +99,7 @@ class PhotoViewCore extends StatefulWidget {
   final PhotoViewImageTapUpCallback? onTapUp;
   final PhotoViewImageTapDownCallback? onTapDown;
   final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final Function()? onCloseCallback;
 
   final HitTestBehavior? gestureDetectorBehavior;
   final bool tightMode;
@@ -134,6 +137,9 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       AnimationController(vsync: this)..addListener(handleRotationAnimation);
   Animation<double>? _rotationAnimation;
 
+  late final AnimationController _opacityAnimationController;
+  Animation<double>? _opacityAnimation;
+
   PhotoViewHeroAttributes? get heroAttributes => widget.heroAttributes;
 
   late ScaleBoundaries cachedScaleBoundaries = widget.scaleBoundaries;
@@ -150,6 +156,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     controller.rotation = _rotationAnimation!.value;
   }
 
+  void handleOpacityAnimation() {
+    opacity.value = _opacityAnimation!.value;
+  }
+
   void onScaleStart(ScaleStartDetails details) {
     // isScrolling = false;
     // isDraging = false;
@@ -159,6 +169,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _scaleAnimationController.stop();
     _positionAnimationController.stop();
     _rotationAnimationController.stop();
+    _opacityAnimationController.stop();
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
@@ -202,8 +213,13 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     final double minScale = scaleBoundaries.minScale;
 
     if (widget.enablePanAlways) {
-      opacity.value = 1.0;
-      animatePosition(_position, clampPosition());
+      if (opacity.value <= 0.3) {
+        animateOpacity(opacity.value, 0.0);
+        widget.onCloseCallback?.call();
+      } else {
+        animateOpacity(opacity.value, 1.0);
+        animatePosition(_position, clampPosition());
+      }
     }
 
     widget.onScaleEnd?.call(context, details, controller.value);
@@ -321,6 +337,14 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       ..fling(velocity: 0.4);
   }
 
+  void animateOpacity(double from, double to) {
+    _opacityAnimation = Tween<double>(begin: from, end: to)
+        .animate(_opacityAnimationController);
+    _opacityAnimationController
+      ..value = 0.0
+      ..fling(velocity: 0.4);
+  }
+
   void animateRotation(double from, double to) {
     _rotationAnimation = Tween<double>(begin: from, end: to)
         .animate(_rotationAnimationController);
@@ -356,6 +380,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       ..addStatusListener(onAnimationStatus);
     _positionAnimationController = AnimationController(vsync: this)
       ..addListener(handlePositionAnimate);
+    _opacityAnimationController = AnimationController(vsync: this)
+      ..addListener(handleOpacityAnimation);
   }
 
   void animateOnScaleStateUpdate(double prevScale, double nextScale) {
@@ -369,6 +395,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _scaleAnimationController.removeStatusListener(onAnimationStatus);
     _scaleAnimationController.dispose();
     _positionAnimationController.dispose();
+    _opacityAnimationController.dispose();
     _rotationAnimationController.dispose();
     super.dispose();
   }
@@ -421,14 +448,39 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               constraints: widget.tightMode
                   ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
                   : null,
-              child: Center(
-                child: Transform(
-                  child: customChildLayout,
-                  transform: matrix,
-                  alignment: calTransformAlignment(),
+              // child: Center(
+              //   child: Transform(
+              //     child: customChildLayout,
+              //     transform: matrix,
+              //     alignment: calTransformAlignment(),
+              //   ),
+              // ),
+              child: ValueListenableBuilder<double>(
+                valueListenable: opacity,
+                builder: (context, opacity, child) {
+                  return Container(
+                    decoration: widget.enablePanAlways
+                        ? null
+                        : widget.backgroundDecoration ?? _defaultDecoration,
+                    color: !widget.enablePanAlways
+                        ? null
+                        : Colors.black.withOpacity(opacity),
+                    child: Transform.scale(
+                      scale: 0.7 + 0.3 * opacity,
+                      alignment: Alignment.center,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Center(
+                  child: Transform(
+                    child: customChildLayout,
+                    transform: matrix,
+                    alignment: calTransformAlignment(),
+                  ),
                 ),
               ),
-              decoration: widget.backgroundDecoration ?? _defaultDecoration,
+              // decoration: widget.backgroundDecoration ?? _defaultDecoration,
             );
 
             if (widget.disableGestures) {
@@ -436,16 +488,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             }
 
             return PhotoViewGestureDetector(
-              child: ValueListenableBuilder<double>(
-                valueListenable: opacity,
-                builder: (context, opacity, child) {
-                  return Opacity(
-                    opacity: opacity,
-                    child: child,
-                  );
-                },
-                child: child,
-              ),
+              child: child,
               onDoubleTap: onDoubleTap,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,

@@ -5,6 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:photo_view_example/screens/examples/gallery/gallery_example.dart';
+import 'package:photo_view_example/screens/examples/image_viewer_expample.dart';
 
 class PhotoExample extends StatefulWidget {
   @override
@@ -143,23 +144,23 @@ class PhotoExampleState extends State<PhotoExample> {
   }
 
   void _onTap(List<Pic> images, int index, String hero) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PhotoViewGallery.builder(
-          builder: (context, index) {
-            return PhotoViewGalleryPageOptions(
-              imageProvider: CachedNetworkImageProvider(images[index].url),
-              heroAttributes: PhotoViewHeroAttributes(tag: hero),
-              onTapUp: (context, details, value) {
-                Navigator.pop(context);
-              },
-              enablePanAlways: true,
-            );
-          },
-          itemCount: images.length,
-          pageController: PageController(initialPage: index),
-        ),
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return ImageViewerExample(
+            images: images,
+            index: index,
+            hero: hero,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
       ),
     );
   }

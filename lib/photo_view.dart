@@ -263,6 +263,7 @@ class PhotoView extends StatefulWidget {
     this.errorBuilder,
     this.enablePanAlways,
     this.strictScale,
+    this.onCloseCallback,
   })  : child = null,
         childSize = null,
         super(key: key);
@@ -299,6 +300,7 @@ class PhotoView extends StatefulWidget {
     this.disableGestures,
     this.enablePanAlways,
     this.strictScale,
+    this.onCloseCallback,
   })  : errorBuilder = null,
         imageProvider = null,
         semanticLabel = null,
@@ -393,6 +395,9 @@ class PhotoView extends StatefulWidget {
   /// A pointer that will trigger a scale has stopped contacting the screen at a
   /// particular location.
   final PhotoViewImageScaleEndCallback? onScaleEnd;
+
+  /// A callback to be called when the user taps on the close button.
+  final Function()? onCloseCallback;
 
   /// [HitTestBehavior] to be passed to the internal gesture detector.
   final HitTestBehavior? gestureDetectorBehavior;
@@ -566,6 +571,7 @@ class _PhotoViewState extends State<PhotoView>
                 errorBuilder: widget.errorBuilder,
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
+                onCloseCallback: widget.onCloseCallback,
               );
       },
     );

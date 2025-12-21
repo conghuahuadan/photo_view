@@ -34,6 +34,7 @@ class ImageWrapper extends StatefulWidget {
     required this.errorBuilder,
     required this.enablePanAlways,
     required this.strictScale,
+    this.onCloseCallback,
   }) : super(key: key);
 
   final ImageProvider imageProvider;
@@ -55,6 +56,7 @@ class ImageWrapper extends StatefulWidget {
   final PhotoViewImageTapUpCallback? onTapUp;
   final PhotoViewImageTapDownCallback? onTapDown;
   final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final Function()? onCloseCallback;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
@@ -205,6 +207,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
       disableGestures: widget.disableGestures ?? false,
       enablePanAlways: widget.enablePanAlways ?? false,
       initialScale: widget.initialScale,
+      onCloseCallback: widget.onCloseCallback,
     );
   }
 
