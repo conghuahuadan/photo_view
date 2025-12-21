@@ -276,7 +276,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             filterQuality: pageOption.filterQuality,
             basePosition: pageOption.basePosition,
             disableGestures: pageOption.disableGestures,
-            enablePanAlways: false,
+            enablePanAlways: pageOption.enablePanAlways,
           )
         : PhotoView(
             key: ObjectKey(index),
@@ -305,7 +305,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             basePosition: pageOption.basePosition,
             disableGestures: pageOption.disableGestures,
             errorBuilder: pageOption.errorBuilder,
-            enablePanAlways: false,
+            enablePanAlways: pageOption.enablePanAlways,
           );
 
     return ClipRect(
@@ -347,6 +347,7 @@ class PhotoViewGalleryPageOptions {
     this.filterQuality,
     this.disableGestures,
     this.errorBuilder,
+    this.enablePanAlways = false,
   })  : child = null,
         childSize = null,
         assert(imageProvider != null);
@@ -370,6 +371,7 @@ class PhotoViewGalleryPageOptions {
     this.tightMode,
     this.filterQuality,
     this.disableGestures,
+    this.enablePanAlways = false,
   })  : errorBuilder = null,
         imageProvider = null;
 
@@ -432,4 +434,6 @@ class PhotoViewGalleryPageOptions {
 
   /// Mirror to [PhotoView.errorBuilder]
   final ImageErrorWidgetBuilder? errorBuilder;
+
+  final bool enablePanAlways;
 }

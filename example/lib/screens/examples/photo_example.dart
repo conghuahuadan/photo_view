@@ -82,29 +82,55 @@ class PhotoExampleState extends State<PhotoExample> {
       body: Container(
         padding: const EdgeInsets.all(8),
         color: Colors.white,
-        child: MasonryGridView.count(
-          crossAxisCount: 3,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return AspectRatio(
-              aspectRatio: 1,
+        child: Column(
+          children: [
+            MasonryGridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 3,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                return AspectRatio(
+                  aspectRatio: 1,
+                  child: GestureDetector(
+                    onTap: () {
+                      _onTap(index);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Hero(
+                        tag: images[index].cover,
+                        child: CachedNetworkImage(
+                          imageUrl: images[index].cover,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                        )),
+                  ),
+                );
+              },
+            ),
+            Container(
+              height: 16,
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              color: Colors.grey[300],
+            ),
+            Container(
+              width: 100,
+              height: 100,
               child: GestureDetector(
                 onTap: () {
-                  _onTap(index);
+                  // _onTap(8);
                 },
-                behavior: HitTestBehavior.opaque,
                 child: Hero(
-                    tag: images[index].cover,
+                    tag: images[8].cover,
                     child: CachedNetworkImage(
-                      imageUrl: images[index].cover,
+                      imageUrl: images[8].cover,
                       fit: BoxFit.cover,
                       alignment: Alignment.topCenter,
                     )),
               ),
-            );
-          },
+            )
+          ],
         ),
       ),
     );
@@ -123,6 +149,7 @@ class PhotoExampleState extends State<PhotoExample> {
               onTapUp: (context, details, value) {
                 Navigator.pop(context);
               },
+              enablePanAlways: false,
             );
           },
           itemCount: images.length,

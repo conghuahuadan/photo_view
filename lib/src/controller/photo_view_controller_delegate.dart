@@ -23,6 +23,8 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   ScaleStateCycle get scaleStateCycle => widget.scaleStateCycle;
 
+  late final ValueNotifier<double> opacity = ValueNotifier(1.0);
+
   Alignment get basePosition {
     if (widget.initialScale == PhotoViewComputedScale.adaptived) {
       final Size size = scaleBoundaries.outerSize;
@@ -75,7 +77,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   void _blindScaleListener() {
     if (!widget.enablePanAlways) {
       controller.position = clampPosition();
-    }
+    } /*  else {
+      controller.position = calOpacity();
+    } */
     if (controller.scale == controller.prevValue.scale) {
       return;
     }
@@ -189,6 +193,41 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     final double minY = ((positionY - 1).abs() / 2) * heightDiff * -1;
     final double maxY = ((positionY + 1).abs() / 2) * heightDiff;
     return CornersRange(minY, maxY);
+  }
+
+  Offset calOpacity({Offset? position, double? scale}) {
+    final double _scale = scale ?? this.scale;
+    final Offset _position = position ?? this.position;
+
+    final double computedWidth = scaleBoundaries.childSize.width * _scale;
+    final double computedHeight = scaleBoundaries.childSize.height * _scale;
+
+    final double screenWidth = scaleBoundaries.outerSize.width;
+    final double screenHeight = scaleBoundaries.outerSize.height;
+
+    double finalX = 0.0;
+    // final cornersX = this.cornersX(scale: _scale);
+    finalX = _position.dx /* .clamp(cornersX.min, cornersX.max) */;
+    if (screenWidth < computedWidth) {}
+
+    double finalY = 0.0;
+    final cornersY = this.cornersY(scale: _scale);
+    finalY = _position.dy /* .clamp(cornersY.min, cornersY.max) */;
+    if (screenHeight < computedHeight) {
+      if (finalY > cornersY.max) {
+        opacity.value = (1 - (finalY - cornersY.max).abs() / 120).clamp(0.3, 1);
+      } else if (finalY < cornersY.min) {
+        opacity.value = (1 - (finalY - cornersY.min).abs() / 120).clamp(0.3, 1);
+      } else {
+        opacity.value = 1;
+      }
+    } else {
+      opacity.value = (1 - finalY.abs() / 120).clamp(0.3, 1);
+    }
+    // debugPrint(
+    //     'computedHeight: ${screenHeight}, ${computedHeight}, ${_position.dy}, ${scaleBoundaries.childSize.height}, ${cornersY.min}, ${cornersY.max}');
+
+    return Offset(finalX, finalY);
   }
 
   Offset clampPosition({Offset? position, double? scale}) {

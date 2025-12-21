@@ -179,7 +179,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     updateMultiple(
       scale: newScale,
       position: widget.enablePanAlways
-          ? delta
+          ? calOpacity(position: delta * details.scale)
           : clampPosition(position: delta * details.scale),
       rotation:
           widget.enableRotation ? _rotationBefore! + details.rotation : null,
@@ -419,11 +419,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             }
 
             return PhotoViewGestureDetector(
-              child: ValueListenableBuilder<Offset>(
-                valueListenable: posOffset,
-                builder: (context, offset, child) {
-                  return Transform.translate(
-                    offset: offset,
+              child: ValueListenableBuilder<double>(
+                valueListenable: opacity,
+                builder: (context, opacity, child) {
+                  return Opacity(
+                    opacity: opacity,
                     child: child,
                   );
                 },
@@ -446,8 +446,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           }
         });
   }
-
-  ValueNotifier<Offset> posOffset = ValueNotifier(Offset.zero);
 
   Alignment calTransformAlignment() {
     if (widget.initialScale == PhotoViewComputedScale.adaptived) {
