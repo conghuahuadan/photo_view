@@ -29,7 +29,8 @@ class _ImageViewerExampleState extends State<ImageViewerExample> {
         builder: (context, index) {
           return PhotoViewGalleryPageOptions(
             imageProvider: CachedNetworkImageProvider(widget.images[index].url),
-            heroAttributes: PhotoViewHeroAttributes(tag: widget.hero),
+            heroAttributes:
+                PhotoViewHeroAttributes(tag: widget.images[index].tag),
             onTapUp: (context, details, value) {
               Navigator.pop(context);
             },

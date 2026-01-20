@@ -228,25 +228,36 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
     return widget.pageOptions!.length;
   }
 
+  late final ValueNotifier<double> opacity = ValueNotifier(1.0);
+
   @override
   Widget build(BuildContext context) {
     // Enable corner hit test
-    return PhotoViewGestureDetectorScope(
-      axis: widget.scrollDirection,
-      child: PageView.builder(
-        reverse: widget.reverse,
-        controller: _controller,
-        onPageChanged: widget.onPageChanged,
-        itemCount: itemCount,
-        itemBuilder: _buildItem,
-        scrollDirection: widget.scrollDirection,
-        physics: widget.scrollPhysics != null
-            ? widget.scrollPhysics!
-                .applyTo(const AlwaysScrollableScrollPhysics())
-            : const PageScrollPhysics()
-                .applyTo(const AlwaysScrollableScrollPhysics()),
-        allowImplicitScrolling: widget.allowImplicitScrolling,
-        pageSnapping: widget.pageSnapping,
+    return ValueListenableBuilder<double>(
+      valueListenable: opacity,
+      builder: (context, value, child) {
+        return Container(
+          color: Colors.black.withOpacity(value),
+          child: child,
+        );
+      },
+      child: PhotoViewGestureDetectorScope(
+        axis: widget.scrollDirection,
+        child: PageView.builder(
+          reverse: widget.reverse,
+          controller: _controller,
+          onPageChanged: widget.onPageChanged,
+          itemCount: itemCount,
+          itemBuilder: _buildItem,
+          scrollDirection: widget.scrollDirection,
+          physics: widget.scrollPhysics != null
+              ? widget.scrollPhysics!
+                  .applyTo(const AlwaysScrollableScrollPhysics())
+              : const PageScrollPhysics()
+                  .applyTo(const AlwaysScrollableScrollPhysics()),
+          allowImplicitScrolling: widget.allowImplicitScrolling,
+          pageSnapping: widget.pageSnapping,
+        ),
       ),
     );
   }
@@ -282,6 +293,9 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             disableGestures: pageOption.disableGestures,
             enablePanAlways: pageOption.enablePanAlways,
             onCloseCallback: pageOption.onCloseCallback,
+            onOpacityChanged: (value) {
+              opacity.value = value;
+            },
           )
         : PhotoView(
             key: ObjectKey(index),
@@ -312,6 +326,9 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             errorBuilder: pageOption.errorBuilder,
             enablePanAlways: pageOption.enablePanAlways,
             onCloseCallback: pageOption.onCloseCallback,
+            onOpacityChanged: (value) {
+              opacity.value = value;
+            },
           );
 
     return ClipRect(

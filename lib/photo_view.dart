@@ -264,6 +264,7 @@ class PhotoView extends StatefulWidget {
     this.enablePanAlways,
     this.strictScale,
     this.onCloseCallback,
+    this.onOpacityChanged,
   })  : child = null,
         childSize = null,
         super(key: key);
@@ -301,6 +302,7 @@ class PhotoView extends StatefulWidget {
     this.enablePanAlways,
     this.strictScale,
     this.onCloseCallback,
+    this.onOpacityChanged,
   })  : errorBuilder = null,
         imageProvider = null,
         semanticLabel = null,
@@ -398,6 +400,9 @@ class PhotoView extends StatefulWidget {
 
   /// A callback to be called when the user taps on the close button.
   final Function()? onCloseCallback;
+
+  /// A callback to be called when the opacity changes.
+  final ValueChanged<double>? onOpacityChanged;
 
   /// [HitTestBehavior] to be passed to the internal gesture detector.
   final HitTestBehavior? gestureDetectorBehavior;
@@ -542,6 +547,7 @@ class _PhotoViewState extends State<PhotoView>
                 disableGestures: widget.disableGestures,
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
+                onOpacityChanged: widget.onOpacityChanged,
               )
             : ImageWrapper(
                 imageProvider: widget.imageProvider!,
@@ -572,6 +578,7 @@ class _PhotoViewState extends State<PhotoView>
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
                 onCloseCallback: widget.onCloseCallback,
+                onOpacityChanged: widget.onOpacityChanged,
               );
       },
     );

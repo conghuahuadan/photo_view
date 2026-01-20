@@ -47,6 +47,11 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   void initDelegate() {
     controller.addIgnorableListener(_blindScaleListener);
     scaleStateController.addIgnorableListener(_blindScaleStateListener);
+    opacity.addListener(_onOpacityChanged);
+  }
+
+  void _onOpacityChanged() {
+    widget.onOpacityChanged?.call(opacity.value);
   }
 
   void _blindScaleStateListener() {
@@ -78,8 +83,6 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void _blindScaleListener() {
-    debugPrint("_blindScaleListener");
-
     if (!widget.enablePanAlways || isScrolling) {
       controller.position = clampPosition();
     } else {
@@ -279,6 +282,7 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   @override
   void dispose() {
+    opacity.removeListener(_onOpacityChanged);
     _animateScale = null;
     controller.removeIgnorableListener(_blindScaleListener);
     scaleStateController.removeIgnorableListener(_blindScaleStateListener);

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -100,7 +102,7 @@ class PhotoExampleState extends State<PhotoExample> {
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Hero(
-                        tag: images[index].cover,
+                        tag: images[index].tag,
                         child: CachedNetworkImage(
                           imageUrl: images[index].cover,
                           fit: BoxFit.cover,
@@ -122,14 +124,16 @@ class PhotoExampleState extends State<PhotoExample> {
                 onTap: () {
                   _onTap([
                     Pic(
-                        cover:
-                            "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif",
-                        url:
-                            "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif")
+                      cover:
+                          "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif",
+                      url:
+                          "http://p8.itc.cn/q_70/images03/20201017/7b03acea8eaa4371a084c5bbc3bbee44.gif",
+                      tag: "1",
+                    )
                   ], 0, "");
                 },
                 child: Hero(
-                    tag: "",
+                    tag: "1",
                     child: CachedNetworkImage(
                       imageUrl: images[8].cover,
                       fit: BoxFit.cover,
@@ -169,5 +173,20 @@ class PhotoExampleState extends State<PhotoExample> {
 class Pic {
   final String cover;
   final String url;
-  Pic({this.cover = "", this.url = ""});
+  String _tag = "";
+  Pic({
+    this.cover = "",
+    this.url = "",
+    String tag = "",
+  }) {
+    if (tag.isNotEmpty) {
+      _tag = tag;
+    } else {
+      _tag = "${url}_${Random().nextInt(999999)}";
+    }
+  }
+
+  String get tag {
+    return _tag.isNotEmpty ? _tag : url;
+  }
 }

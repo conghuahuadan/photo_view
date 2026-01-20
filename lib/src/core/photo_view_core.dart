@@ -52,6 +52,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.strictScale,
     required this.initialScale,
     this.onCloseCallback,
+    this.onOpacityChanged,
   })  : customChild = null,
         super(key: key);
 
@@ -77,6 +78,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.strictScale,
     required this.initialScale,
     this.onCloseCallback,
+    this.onOpacityChanged,
   })  : imageProvider = null,
         semanticLabel = null,
         gaplessPlayback = false,
@@ -100,6 +102,7 @@ class PhotoViewCore extends StatefulWidget {
   final PhotoViewImageTapDownCallback? onTapDown;
   final PhotoViewImageScaleEndCallback? onScaleEnd;
   final Function()? onCloseCallback;
+  final ValueChanged<double>? onOpacityChanged;
 
   final HitTestBehavior? gestureDetectorBehavior;
   final bool tightMode;
@@ -462,7 +465,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
                     decoration: widget.enablePanAlways
                         ? null
                         : widget.backgroundDecoration ?? _defaultDecoration,
-                    color: !widget.enablePanAlways
+                    color: !widget.enablePanAlways ||
+                            widget.onOpacityChanged == null
                         ? null
                         : Colors.black.withOpacity(opacity),
                     child: Transform.scale(

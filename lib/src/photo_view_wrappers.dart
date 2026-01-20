@@ -35,6 +35,7 @@ class ImageWrapper extends StatefulWidget {
     required this.enablePanAlways,
     required this.strictScale,
     this.onCloseCallback,
+    this.onOpacityChanged,
   }) : super(key: key);
 
   final ImageProvider imageProvider;
@@ -57,6 +58,7 @@ class ImageWrapper extends StatefulWidget {
   final PhotoViewImageTapDownCallback? onTapDown;
   final PhotoViewImageScaleEndCallback? onScaleEnd;
   final Function()? onCloseCallback;
+  final ValueChanged<double>? onOpacityChanged;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
@@ -208,6 +210,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
       enablePanAlways: widget.enablePanAlways ?? false,
       initialScale: widget.initialScale,
       onCloseCallback: widget.onCloseCallback,
+      onOpacityChanged: widget.onOpacityChanged,
     );
   }
 
@@ -259,6 +262,7 @@ class CustomChildWrapper extends StatelessWidget {
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
+    this.onOpacityChanged,
   }) : super(key: key);
 
   final Widget? child;
@@ -280,6 +284,7 @@ class CustomChildWrapper extends StatelessWidget {
   final PhotoViewImageTapUpCallback? onTapUp;
   final PhotoViewImageTapDownCallback? onTapDown;
   final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final ValueChanged<double>? onOpacityChanged;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
@@ -318,6 +323,7 @@ class CustomChildWrapper extends StatelessWidget {
       disableGestures: disableGestures ?? false,
       enablePanAlways: enablePanAlways ?? false,
       initialScale: initialScale,
+      onOpacityChanged: onOpacityChanged,
     );
   }
 }
